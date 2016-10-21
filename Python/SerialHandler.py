@@ -9,7 +9,6 @@ class SerialHandler:
         self.Start_Time = time.strftime("%Y%m%dT%H%M%S") 
         self.Start_Time_Long = time.time() 
         self.createConnection()
-        self.SendMessages = True
         self.promptOutputPeriod() 
       
     #Having user select the correct COM port for the Arduino  
@@ -32,13 +31,13 @@ class SerialHandler:
             print 'Port not in range'
             exit(1)
         self.ser=serial.Serial(port=port_names[int(user_port_selection)],baudrate=9600,timeout=1)
-    
+        
     #Having user select how frequently to output data   
     def promptOutputPeriod(self):
         self.Out_Period = 0
-        while(self.Out_Period <0.1): 
-            self.Out_Period = input('Output data how often(seconds)? Minimum 0.1s    ')
-        
+        while(self.Out_Period <0.3): 
+            self.Out_Period = input('Output data how often(seconds)? Minimum 0.3s    ')
+            
     #Makes sure this script does not start in the middle of one of the Arduino output lines
     def syncToBoard(self):
         mycmd = ""
@@ -57,10 +56,6 @@ class SerialHandler:
             print "Serial Error"  
         return msg
     
-    def writeLine(self, msg):
-        if self.SendMessages:
-            self.ser.write(msg)
-            
     #Close serial connection
     def close(self): 
         self.ser.close()
