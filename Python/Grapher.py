@@ -13,30 +13,53 @@ class Grapher:
     #8640 samples represents 24 hours of data taken every 10 seconds
     #Once the deque's are filled, they start replacing the oldest elements
     #Therefore, runs for more than 24 hours and only shows last 24 hours.
+    #ending of 1 means humidity and 2 means dewpoint
     def __init__(self, ProgramStartTime = time.strftime("%Y%m%dT%H%M%S")):
         pg.setConfigOption('background', 'w')
         pg.setConfigOption('foreground', 'k')
         self.xData = collections.deque(maxlen=8640) 
         self.yData = collections.deque(maxlen=8640) 
+        self.yData1 = collections.deque(maxlen=8640) 
+        self.yData2 = collections.deque(maxlen=8640)
+        self.maxy = 32 
         self.Program_Start_Time = ProgramStartTime  
         self.app = QtGui.QApplication([])
         self.p = pg.plot()
-        self.curve = self.p.plot(pen=pg.mkPen('r', width=3))      
+        self.p.addLegend()
+        self.curve = self.p.plot(pen=pg.mkPen('g', width=3), name = "Temp")
+        self.curve1 = self.p.plot(pen=pg.mkPen('r', width=3), name = "Hmdty") 
+        self.curve2 = self.p.plot(pen=pg.mkPen('b', width=3), name = "Dwpnt")     
         self.initializeGraph() 
 
         
     #Setting how the plot looks
     def initializeGraph(self):
-        self.p.setRange(yRange=[-20,32])
-        self.p.setTitle('Temp vs. Time')
-        self.p.setLabel(axis = 'left', text = 'Temperature (C)')
+        self.p.setRange(yRange=[-20,self.maxy])
+        self.p.setTitle('Temp/Hmdty/Dwpnt vs. Time')
+        self.p.setLabel(axis = 'left', text = 'Temp (C)   Hmdty(%)')
         self.p.setLabel(axis = 'bottom', text = "Hours since %s"%self.Program_Start_Time) 
         self.p.showGrid(x=True, y=True, alpha=None)
 
-    def plotData(self,x,y):
+    def updateMaxY(self, y, y1, y2):
+        if y > self.maxy: 
+            self.maxy = y
+            self.p.setRange(yRange=[-20,self.maxy])
+        if y1 > self.maxy: 
+            self.maxy = y1
+            self.p.setRange(yRange=[-20,self.maxy])
+        if y2 > self.maxy: 
+            self.maxy = y2
+            self.p.setRange(yRange=[-20,self.maxy])   
+
+    def plotData(self,x,y,y1,y2):
+        self.updateMaxY(y, y1, y2)
         self.xData.append(x) 
         self.yData.append(y)
+        self.yData1.append(y1)
+        self.yData2.append(y2)
         self.curve.setData(list(self.xData),list(self.yData)) #Plotting the data   
+        self.curve1.setData(list(self.xData),list(self.yData1))
+        self.curve2.setData(list(self.xData),list(self.yData2))
     
     def processEvents(self):
         self.app.processEvents()

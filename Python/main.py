@@ -37,8 +37,8 @@ def onPeriod():
     if(msg != "No temperature data"): 
         #File_Writer.writeToTxt(Serial_Handler.getStart_Time(), now, msg) 
         File_Writer.writeToCsv(Serial_Handler.getStart_Time(), now, temp, hmdty, dwpnt) 
-        Plotter.plotData(float((time.time()-Serial_Handler.getStart_Time_Long())/3600), float(temp)) 
-      
+        Plotter.plotData(float((time.time()-Serial_Handler.getStart_Time_Long())/3600),
+                         float(temp), float(hmdty), float(dwpnt)) 
       
 Start = time.time()             
 Serial_Handler.syncToBoard()	    
@@ -50,7 +50,7 @@ while(1):
         temp = Temp_Handler.extractTemp(msg)
         Humidity_Handler.recordTemp(Humidity_Handler.getWord(msg,1)) #Quick hack by using recordTemp instead of
         Dewpoint_Handler.recordTemp(Dewpoint_Handler.getWord(msg,2)) #making a recordHumidity
-        
+
         dt = time.time() - Start
         if(dt >= Serial_Handler.getOut_Period()): 
             onPeriod() 
