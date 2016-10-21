@@ -14,10 +14,12 @@ class FileWriter:
             writer.writerow([now, str(temp), str(hmdty), str(dwpnt)])
 
     def getCsvData(self, path):
-        Data = [[],[]]
+        Data = [[],[],[],[]]
         with open(path, 'rb') as f:
             reader = csv.reader(f)
             for row in reader:
                 Data[0].append(row[0])
                 Data[1].append(row[1])
+                Data[2].append(row[2])
+                Data[3].append(row[3])
         return Data
